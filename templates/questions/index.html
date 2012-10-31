@@ -1,0 +1,102 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>SINQ</title> 
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+	<link rel="stylesheet" href="/static/css/sinq.css" />
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+</head> 
+
+<body> 
+
+<div data-role="page">
+
+	<!--
+	<div data-role="header">
+		<h1>SINQ</h1>
+	</div>
+	-->
+	<!-- /header -->
+
+	<div data-role="content">
+
+		<center>
+		<img src="/static/sinq_logo.png"/>
+		</center>
+
+		<!-- <a href="/sinq/questions/create/" data-role="button" data-inline="false" data-theme="b">Create Question</a> -->
+
+		<h1>Questions</h1>
+
+<!-- 		<div id="question_container" class="masonry">
+			<div class="box"><img src="http://placehold.it/300x200" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/100x150" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/200x100" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/300x200" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/100x100" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/100x150" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/200x100" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/100x100" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/300x200" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/100x150" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/200x100" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/100x100" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/300x200" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/100x150" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/300x200" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/300x200" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/200x100" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/100x100" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/300x200" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/100x150" /><br />Question</div>
+			<div class="box"><img src="http://placehold.it/200x100" /><br />Question</div>
+		</div> -->
+		<p>	
+ 		{% if latest_question_list %}
+			<ul data-role="listview">
+			{% for question in latest_question_list %}
+				<li><a href="/sinq/questions/{{ question.id }}/">
+					<!-- <img src="http://placehold.it/100x100" /> -->
+					{% for question_image in question.images.all|slice:":1" %}
+						<img src="{{ question_image.image.url }}" width="100" height="100" /><br />
+					{% endfor %}
+					<h3>{{ question.text }}</h3>
+					<!-- <p>Ask your questions.</p> -->
+				</a></li>
+			{% endfor %}
+			</ul>
+		{% else %}
+			<p>No questions are available!</p>
+		{% endif %}
+		</p>
+
+	</div><!-- /content -->
+
+	<script src="/static/js/jquery.masonry.min.js"></script>
+	<script>
+	// $(function(){
+	$(document).ready(function() {	
+
+		$('#question_container').masonry({
+			itemSelector: '.box',
+			columnWidth: 10
+		});
+
+		$('#question_container').imagesLoaded(function() {
+			$('#question_container').masonry('reload');
+		});
+
+	});
+	</script>
+	
+	<div data-role="footer">
+		<h4>2011&ndash;2012.  Human-Computer Interaction Lab (HCIL). University of Maryand, College Park.</h4>
+	</div><!-- /footer -->
+	
+</div><!-- /page -->
+
+</body>
+</html>

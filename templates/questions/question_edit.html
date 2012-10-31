@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>SINQ</title>
+</head>
+
+<body>
+<h1>{{ question.text }}</h1>
+
+{% if error_message %}
+<p><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+<form action="/sinq/questions/{{ question.id }}/edit/" method="post">
+	{% csrf_token %}
+	{{ form.question_text.label }} {{ form.question_text }}
+	<p><input type="submit" value="Save" /></p>
+</form>
+
+<!-- <form action="/questions/{{ question.id }}/edit/" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+<label for="question_text">What do you wonder about?:</label><br />
+<input type="text" name="question_text" id="question_text" value="{{ question.text }}" /><br />
+<input type="file" name="question_image" id="question_image" /><br />
+<input type="submit" value="Save" />
+</form> -->
+
+</body>
+</html>

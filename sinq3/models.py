@@ -13,20 +13,58 @@ class Question(models.Model):
 class QuestionImage(models.Model):
 	question = models.ForeignKey('Question', related_name='images')
 
-	image = models.ImageField(upload_to='images/')
+	image = models.ImageField(upload_to='images/questions/')
+
+class QuestionVideo(models.Model):
+	question = models.ForeignKey('Question', related_name='videos')
+
+	video = models.FileField(upload_to='videos/questions/')
+
+class Hypothesis(models.Model):
+	# Dependencies (i.e., parent)
+	question = models.ForeignKey('Question', related_name='hypotheses')
+
+	text = models.TextField()
+
+	def __unicode__(self):
+		return self.text
+
+class HypothesisImage(models.Model):
+	hypothesis = models.ForeignKey('Hypothesis', related_name='images')
+
+	image = models.ImageField(upload_to='images/hypotheses/')
+
+class HypothesisVideo(models.Model):
+	hypothesis = models.ForeignKey('Hypothesis', related_name='videos')
+
+	video = models.FileField(upload_to='videos/questions/')
+
+class Project(models.Model):
+	# Dependencies (i.e., parent)
+	hypothesis = models.ForeignKey('Hypothesis', related_name='projects')
+
+	# name = models.TextField()
+
+	creation_timestamp = models.DateTimeField('date published')
+	last_modification_timestamp = models.DateTimeField('date created')
 
 	# Called by Django when printing objects... give it something more helpful for programers to read (pretty print).
 	# def __unicode__(self):
-	# 	return 'Image for ' + self.question.text
+	# 	return self.name
 
-class Project(models.Model):
-	name = models.TextField()
-	creation_timestamp = models.DateTimeField('date published')
+class ProjectInstruction(models.Model):
+	# Dependencies
+	project = models.ForeignKey('Project', related_name='instructions')
 
-	#question = models.ForeignKey(Question)
+	text = models.TextField()
 
-	# creator (use Django authentication)
+class ProjectInstructionImage(models.Model):
+	# Dependencies
+	project_instruction = models.ForeignKey('ProjectInstruction', related_name='images')
 
-	# Called by Django when printing objects... give it something more helpful for programers to read (pretty print).
-	def __unicode__(self):
-		return self.name
+	image = models.ImageField(upload_to='images/projects/instructions/')
+
+class ProjectInstructionVideo(models.Model):
+	project_instruction = models.ForeignKey('ProjectInstruction', related_name='videos')
+
+	video = models.FileField(upload_to='videos/projects/instructions')

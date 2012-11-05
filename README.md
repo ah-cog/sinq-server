@@ -3,6 +3,11 @@ SINQ
 
 SINQ (Sientific INQuery) is a project from the Human-Computer Interaction Lab at the University of Maryland, College Park.
 
+Configure Server
+================
+
+The SINQ server depends on several software packages.  These are the Apache HTTP Server, PostgreSQL, Python, mod_wsgi, Django, Python Imaging Library (PIL), PyGreSQL.  These must be installed on the server envirnoment.  Once these are installed, they must be configured for SINQ.
+
 Configure Django
 ================
 
@@ -20,6 +25,16 @@ This directory contains the following:
 	./sinq3/
 	./static/
 	./templates/
+
+To configure the Django project, create the following file:
+
+	./sinq/local_settings.py
+
+Alternatively, modify the settings in the file:
+
+	./sing/settings.py
+
+I recommend creating a the <code>./sinq/local_settings.py</code>.
 
 Configure Apache Server
 =======================

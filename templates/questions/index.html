@@ -21,7 +21,33 @@
 	-->
 	<!-- /header -->
 
-	<div data-role="content">
+	<div data-role="content" id="content_page">
+
+
+
+
+
+		<div id="container">
+			<div class="item">Thing 1</div>
+			<div class="item">Thing 2</div>
+			<div class="item">Thing 3</div>
+		</div>
+        
+        <script src="./assets/js/jquery.isotope.min.js"></script>
+        <script type="text/javascript" charset="utf-8">
+            
+            //$(document).ready(function() {
+            $("#content_page").bind("pageshow", function() {
+            	alert("sheet!");
+                var $container = $('#container');
+
+				$container.isotope({
+					itemSelector: '.item',
+					layoutMode : 'fitRows'
+				});
+            });
+            
+        </script>
 
 		<center>
 		<img src="/assets/sinq_logo.png"/>
@@ -75,22 +101,8 @@
 
 	</div><!-- /content -->
 
-	<script src="/assets/js/jquery.masonry.min.js"></script>
-	<script>
-	// $(function(){
-	$(document).ready(function() {	
 
-		$('#question_container').masonry({
-			itemSelector: '.box',
-			columnWidth: 10
-		});
 
-		$('#question_container').imagesLoaded(function() {
-			$('#question_container').masonry('reload');
-		});
-
-	});
-	</script>
 	
 	<div data-role="footer">
 		<h4>2011&ndash;2012.  Human-Computer Interaction Lab (HCIL). University of Maryand, College Park.</h4>

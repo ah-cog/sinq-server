@@ -1,69 +1,284 @@
-<!DOCTYPE html> 
-<html>
-
+<!doctype html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
+	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<title>SINQ</title> 
-	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
-	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
-	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
-</head> 
 
-<body> 
+	<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 
-<div data-role="page">
+	<link rel="stylesheet" href="/assets/css/jquery.isotope.min.css" />
 
-	<div data-role="header">
-		<h1>SINQ</h1>
-	</div><!-- /header -->
+	<link rel="stylesheet" href="/assets/css/jquery.mobile-1.2.0.min.css" />
+	<script src="/assets/js/jquery-1.8.2.min.js"></script>
+	<script src="/assets/js/jquery.mobile-1.2.0.min.js"></script>
 
-	<div data-role="content">
-		<!-- <p>This is a single page boilerplate template that you can copy to build your first jQuery Mobile page. Each link or form from here will pull a new page in via Ajax to support the animated page transitions.</p>		
-		<p>Just view the source and copy the code to get started. All the CSS and JS is linked to the jQuery CDN versions so this is super easy to set up. Remember to include a meta viewport tag in the head to set the zoom level.</p>
-		<p>This template is standard HTML document with a single "page" container inside, unlike a <a href="multipage-template.html" data-ajax="false">multi-page template</a> that has multiple pages within it. We strongly recommend building your site or app as a series of separate pages like this because it's cleaner, more lightweight and works better without JavaScript.</p> -->
+	<link rel="stylesheet" href="/assets/css/sinq.css" />
 
-		<div style="margin: 0 auto;">
-			<img src="/assets/sinq_logo.png" style="margin: 0 auto;" />
+	<!-- scripts at bottom of page -->
+
+	<style>
+        .ui-page { background: #4584be;}
+        body { background-color: #4584be; }
+    </style>
+</head>
+<body class="homepage">
+
+	<div data-role="page">
+
+		<div id="banner" style="width: 100%; background-color: #ffffff; padding-top: 50px; padding-bottom: 50px;">
+			<center>
+			<img src="/assets/sinq_logo.png"/>
+			</center>
 		</div>
 
-		{% if error_message %}
-		<p><strong>{{ error_message }}</strong></p>
-		{% endif %}
+		<div id="banner" style="width: 100%; background-color: #ffffff; padding-top: 0px; padding-bottom: 50px; border-bottom: 10px solid #2f5b7f;">
+			<center>
+			<a href="" style="color: #2f5b7f">Questions</a>
+			Cause and Effect 
+			<!-- 
+			TODO: Add "Experiments" link
+			-->
+			</center>
+		</div>
 
-		<ul data-role="listview" data-inset="true">
-			<li><a href="/sinq/profile/">
-				<img src="http://placehold.it/100x100" />
-				<h3>Me</h3>
-				<p>My projects, questions, and hypotheses.</p>
-			</a></li>
-		</ul>
+		<div data-role="content" id="content_page">			
+  
+ 			<section id="content">
 
-		<ul data-role="listview" data-inset="true">
-			<li><a href="/sinq/questions/">
-				<img src="http://placehold.it/100x100" />
-				<h3>Questions</h3>
-				<p>Ask your questions.</p>
-			</a></li>
-			<li><a href="/sinq/hypotheses/">
-				<img src="http://placehold.it/100x100" />
-				<h3>Hypotheses</h3>
-				<p>Help build projects by creating hypotheses.</p>
-			</a></li>
-			<li><a href="/sinq/projects/">
-				<img src="http://placehold.it/100x100" />
-				<h3>Projects</h3>
-				<p>Try out a project!</p>
-			</a></li>
-		</ul>
+      			<section id="options" class="clearfix">
+					<div class="option-combo">
+					<h2>Filter:</h2>
+					<ul id="filter" class="option-set clearfix" data-option-key="filter">
+						<li><a href="#show-all" data-option-value="*" class="selected">Show all</a></li>
+						<!-- <li><a href="#elements" data-option-value=".element:not(.feature)">elements</a></li> -->
+						<!-- <li><a href="#features" data-option-value=".feature">features</a></li> -->
+						<!-- <li><a href="#examples" data-option-value=".example">examples</a></li> -->
 
-	</div><!-- /content -->
-	
-	<div data-role="footer">
-		<h4>2011&ndash;2012.  Human-Computer Interaction Lab (HCIL). University of Maryand, College Park.</h4>
-	</div><!-- /footer -->
-	
-</div><!-- /page -->
+						<li><a href="#questions" data-option-value=".question">Questions</a></li>
+						<li><a href="#hypotheses" data-option-value=".hypothesis">Cause and Effect</a></li>
+						<!-- <li><a href="#experiments" data-option-value=".experiment">Experiments</a></li> -->
+						<!-- 
+						TODO:
+						- Add filters for "my stuff", "everyone else's stuff"
+						-->
+					</ul>
+					</div>
+					<div class="option-combo">
+					<h2>Sort:</h2>
+					<ul id="sort" class="option-set clearfix" data-option-key="sortBy">
+						<li><a href="#mixed" data-option-value="number" class="selected">mixed</a></li>
+						<li><a href="#original" data-option-value="original-order">original</a></li>
+						<li><a href="#alphabetical" data-option-value="alphabetical">ABC</a></li>
+						<!-- 
+						TODO:
+						- Add options to sort by datetime created, datetime last modified, highest rated, most popular
+						-->
+					</ul>
+					</div>
+					<div class="option-combo">
+					<h2>Layout: </h2>
+					<ul id="layouts" class="option-set clearfix" data-option-key="layoutMode">
+						<li><a href="#masonry" data-option-value="masonry" class="selected">Many</a></li>
+						<li><a href="#fitRows" data-option-value="fitRows">Fit Rows</a></li>
+						<li><a href="#straightDown" data-option-value="straightDown">List</a></li>
+					</ul>
+					</div>
+				</section>
+  
+				<div id="container" class="super-list variable-sizes clearfix">
+
+
+					{% if latest_question_list %}
+						{% for question in latest_question_list %}
+							<!-- <li><a href="/sinq/questions/{{ question.id }}/">
+								{% for question_image in question.images.all|slice:":1" %}
+									<img src="{{ question_image.image.url }}" width="100" height="100" /><br />
+								{% endfor %}
+								<h3>{{ question.text }}</h3>
+							</a></li> -->
+
+							<!-- <div class="element alkaline-earth metal   " data-symbol="Mg" data-category="alkaline-earth"> -->
+							<!-- <a href="/sinq/questions/{{ question.id }}/"> -->
+							{% for question_image in question.images.all|slice:":1" %}
+								<div class="question element feature  width2 height2 alkaline-earth metal   " data-symbol="Mg" data-category="alkaline-earth" style="background-color: transparent; background-image:url('{{ question_image.image.url }}');">
+									<a href="/sinq/questions/{{ question.id }}/">
+									<div style="width: 230px; height: 230px;">
+										<!-- <p class="number">{{ question.id }}</p> -->
+										<!-- <h3 class="symbol">How</h3> -->
+										<!-- <h2 class="name">{{ question.text }}</h2> -->
+										<h2 class="text">{{ question.text }}</h2>
+										<!-- <p class="weight">24.305</p> -->
+									</div>
+									</a>
+								</div>
+							{% endfor %}
+							<!-- </a> -->
+						{% endfor %}
+					{% else %}
+						<p>No questions are available!</p>
+					{% endif %}
+
+
+			        <!--
+			        Example use of Isotope:
+
+					<div class="element alkaline-earth metal   " data-symbol="Mg" data-category="alkaline-earth">
+					<p class="number">12</p>
+					<h3 class="symbol">Mg</h3>
+					<h2 class="name">Magnesium</h2>
+					<p class="weight">24.305</p>
+					</div>
+
+					<div class="link" data-number="5"><a href="jquery.isotope.min.js">Down&#8203;load jquery&#8203;.isotope&#8203;.min.js</a></div>
+					<div class="link" data-number="13"><a href="http://meta.metafizzy.co/files/isotope-site.zip">Down&#8203;load this project</a></div> 
+					<div class="link away" data-number="35"><a href="http://github.com/desandro/isotope">Isotope on GitHub</a></div>
+					-->
+				</div>
+
+  				<div id="sites"></div>
+
+  			</section><!-- /content -->
+
+  		</div><!-- /content -->
+  
+  
+		<script src="/assets/js/jquery-1.8.2.min.js"></script>
+		<script src="/assets/js/jquery.isotope.min.js"></script>
+		<script>
+		$(function(){
+
+			var $container = $('#container');
+
+			$container.isotope({
+				masonry: {
+					columnWidth: 120
+				},
+				sortBy: 'number',
+				getSortData: {
+					number: function( $elem ) {
+						var number = $elem.hasClass('element') ? 
+							$elem.find('.number').text() :
+							$elem.attr('data-number');
+						return parseInt( number, 10 );
+					},
+					alphabetical: function( $elem ) {
+						var text = $elem.find('.text'),
+						itemText = name.length ? text : $elem;
+						return itemText.text();
+					}
+				}
+			});
+
+
+			var $optionSets = $('#options .option-set'),
+				$optionLinks = $optionSets.find('a');
+
+			$optionLinks.click(function(){
+				var $this = $(this);
+				// don't proceed if already selected
+				if ( $this.hasClass('selected') ) {
+					return false;
+				}
+				var $optionSet = $this.parents('.option-set');
+				$optionSet.find('.selected').removeClass('selected');
+				$this.addClass('selected');
+
+				// make option object dynamically, i.e. { filter: '.my-filter-class' }
+				var options = {},
+					key = $optionSet.attr('data-option-key'),
+					value = $this.attr('data-option-value');
+				// parse 'false' as false boolean
+				value = value === 'false' ? false : value;
+				options[ key ] = value;
+				if ( key === 'layoutMode' && typeof changeLayoutMode === 'function' ) {
+					// changes in layout modes need extra logic
+					changeLayoutMode( $this, options )
+				} else {
+					// otherwise, apply new options
+					$container.isotope( options );
+				}
+
+				return false;
+			});
+
+
+
+			// Sites using Isotope markup
+			/*
+			var $sites = $('#sites'),
+			$sitesTitle = $('<h2 class="loading"><img src="http://i.imgur.com/qkKy8.gif" />Loading sites using Isotope</h2>'),
+			$sitesList = $('<ul class="clearfix"></ul>');
+
+			$sites.append( $sitesTitle ).append( $sitesList );
+
+			$sitesList.isotope({
+				layoutMode: 'cellsByRow',
+				cellsByRow: {
+					columnWidth: 290,
+					rowHeight: 400
+				}
+			});
+			*/
+
+			var ajaxError = function(){
+				$sitesTitle.removeClass('loading').addClass('error')
+				.text('Could not load sites using Isotope :(');
+			};
+
+			// dynamically load sites using Isotope from Zootool
+			$.getJSON('http://zootool.com/api/users/items/?username=desandro' +
+			'&apikey=8b604e5d4841c2cd976241dd90d319d7' +
+			'&tag=bestofisotope&callback=?')
+				.error( ajaxError )
+				.success(function( data ){
+
+					// proceed only if we have data
+					if ( !data || !data.length ) {
+						ajaxError();
+						return;
+					}
+					var items = [],
+					item, datum;
+
+					for ( var i=0, len = data.length; i < len; i++ ) {
+						datum = data[i];
+						item = '<li><a href="' + datum.url + '">'
+							+ '<img src="' + datum.image.replace('/l.', '/m.') + '" />'
+							+ '<b>' + datum.title + '</b>'
+							+ '</a></li>';
+						items.push( item );
+					}
+
+					var $items = $( items.join('') )
+						.addClass('example');
+
+					// set random number for each item
+					$items.each(function(){
+						$(this).attr('data-number', ~~( Math.random() * 100 + 15 ));
+					});
+
+					$items.imagesLoaded(function(){
+						$sitesTitle.removeClass('loading').text('Sites using Isotope');
+						$container.append( $items );
+						$items.each(function(){
+							var $this = $(this),
+							itemHeight = Math.ceil( $this.height() / 120 ) * 120 - 10;
+							$this.height( itemHeight );
+						});
+						$container.isotope( 'insert', $items );
+					});
+
+				});
+
+
+		});
+		</script>
+
+		<div data-role="footer">
+			<h4>2011&ndash;2012.  Human-Computer Interaction Lab (HCIL). University of Maryand, College Park.</h4>
+		</div><!-- /footer -->
+
+ 	</div><!-- /page -->
 
 </body>
 </html>

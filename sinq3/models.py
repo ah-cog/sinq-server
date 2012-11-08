@@ -22,7 +22,11 @@ class QuestionVideo(models.Model):
 
 class Hypothesis(models.Model):
 	# Dependencies (i.e., parent)
-	question = models.ForeignKey('Question', related_name='hypotheses')
+	question = models.ManyToManyField('Question', blank=True, null=True)
+
+	# Properties
+	cause = models.TextField()
+	effect = models.TextField()
 
 	text = models.TextField()
 
@@ -30,12 +34,13 @@ class Hypothesis(models.Model):
 		return self.text
 
 class HypothesisImage(models.Model):
+	#hypothesis = models.ManyToManyField('Hypothesis')
 	hypothesis = models.ForeignKey('Hypothesis', related_name='images')
 
 	image = models.ImageField(upload_to='images/hypotheses/')
 
 class HypothesisVideo(models.Model):
-	hypothesis = models.ForeignKey('Hypothesis', related_name='videos')
+	hypothesis = models.ManyToManyField('Hypothesis')
 
 	video = models.FileField(upload_to='videos/questions/')
 

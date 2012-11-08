@@ -11,3 +11,9 @@ class QuestionImageForm(forms.Form):
 		label='Select a picture!',
 		help_text='max size?'
 	)
+
+class HypothesisImageForm(forms.Form):
+	hypothesis_image = forms.ImageField(
+		label='Select a picture!',
+		help_text='max size?'
+	)

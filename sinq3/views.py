@@ -272,6 +272,100 @@ def question_image_create_api(request, question_id):
 	else:
 		raise Http500
 
+	elif request.method == 'OPTIONS':
+		# Enable CORS (Cross-Origin Resource Sharing)
+		# http://enable-cors.org/#how-gae
+		# - This must be added to headers to enable requests from origins other 
+		#   than Google (i.e., wherever students host their websites).
+		#self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+		response = HttpResponse()
+		response['Access-Control-Allow-Origin'] = '*'
+		
+		# Enable access to the DELETE HTTP request method cross-origin
+		# http://www.w3.org/TR/cors/#introduction
+		response['Access-Control-Max-Age'] = '3600'
+		#response['Access-Control-Allow-Methods'] = 'DELETE'
+
+@csrf_exempt
+def hypothesis_read(request, hypothesis_id):
+
+	if request.method == 'GET':
+		try:
+			hypothesis = Hypothesis.objects.get(id=hypothesis_id)
+		except:
+			raise Http404
+
+		# Retreive request data
+		format = request.GET['format'] if 'format' in request.GET else None
+
+		if format == 'json':
+			# Serialize questions in JSON format
+			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
+			serialized_hypotheses = serializers.serialize('json', [hypothesis], fields=('cause', 'effect'))
+			response = HttpResponse(serialized_hypotheses, mimetype="application/json")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
+
+		else:
+			# Display the question
+			t = loader.get_template('hypotheses/hypothesis_view.html')
+			c = Context({
+					'hypothesis': hypothesis
+				})
+
+			return HttpResponse(t.render(c))
+
+	elif request.method == 'OPTIONS':
+		# Enable CORS (Cross-Origin Resource Sharing)
+		# http://enable-cors.org/#how-gae
+		# - This must be added to headers to enable requests from origins other 
+		#   than Google (i.e., wherever students host their websites).
+		#self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+		response = HttpResponse()
+		response['Access-Control-Allow-Origin'] = '*'
+		
+		# Enable access to the DELETE HTTP request method cross-origin
+		# http://www.w3.org/TR/cors/#introduction
+		response['Access-Control-Max-Age'] = '3600'
+		#response['Access-Control-Allow-Methods'] = 'DELETE'
+
+@csrf_exempt
+def hypothesis_read_api(request, hypothesis_id):
+
+	if request.method == 'GET':
+		try:
+			hypothesis = Hypothesis.objects.get(id=hypothesis_id)
+		except:
+			raise Http404
+
+		# Retreive request data
+		format = request.GET['format'] if 'format' in request.GET else None
+
+		if format == 'json':
+			# Serialize questions in JSON format
+			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
+			serialized_hypotheses = serializers.serialize('json', [hypothesis], fields=('cause', 'effect'))
+			response = HttpResponse(serialized_hypotheses, mimetype="application/json")
+			response['Access-Control-Allow-Origin'] = '*'
+			return response
+
+		else:
+			raise Http404
+
+	elif request.method == 'OPTIONS':
+		# Enable CORS (Cross-Origin Resource Sharing)
+		# http://enable-cors.org/#how-gae
+		# - This must be added to headers to enable requests from origins other 
+		#   than Google (i.e., wherever students host their websites).
+		#self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+		response = HttpResponse()
+		response['Access-Control-Allow-Origin'] = '*'
+		
+		# Enable access to the DELETE HTTP request method cross-origin
+		# http://www.w3.org/TR/cors/#introduction
+		response['Access-Control-Max-Age'] = '3600'
+		#response['Access-Control-Allow-Methods'] = 'DELETE'
+
 @csrf_exempt
 def hypothesis_image_create_api(request, hypothesis_id):
 	# Get question to which the image will be attached.
@@ -396,6 +490,12 @@ def hypothesis_create_api(request):
 
 			hypothesis = Hypothesis(cause = hypothesis_data['cause_text'], effect = hypothesis_data['effect_text'])
 			hypothesis.save()
+			# Set up many-to-many associations after saving the object
+			# if hypothesis_data.contains('question_id'):
+			# 	question_id = hypothesis_data['question_id']
+			# 	question = Question.objects.get(id=question_id)
+			# 	hypothesis.question.add(question)
+			# 	hypothesis.save() # Save the many-to-many relationship
 
 			# Serialize hypotheses in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/

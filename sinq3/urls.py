@@ -16,6 +16,7 @@ urlpatterns = patterns('sinq3.views',
 	url(r'^questions/(?P<question_id>\d+)/images/create/$', 'question_image_create'), # /questions/{{ question.id }}/images/create/
 
 	url(r'^api/hypotheses/create/$', 'hypothesis_create_api'), # /hypotheses/create/
+	url(r'^api/hypotheses/(?P<hypothesis_id>\d+)/$', 'hypothesis_read_api'), # /hypotheses/{{ hypothesis.id }}/
 	url(r'^api/hypotheses/(?P<hypothesis_id>\d+)/images/create/$', 'hypothesis_image_create_api'), # /hypotheses/{{ hypothesis.id }}/images/create/
 	url(r'^api/questions/create/$', 'question_create_api'), # /questions/create/
 	url(r'^api/questions/(?P<question_id>\d+)/images/create/$', 'question_image_create_api'), # /questions/{{ question.id }}/images/create/

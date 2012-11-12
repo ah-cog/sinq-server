@@ -269,8 +269,8 @@ def question_image_create_api(request, question_id):
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
 			serialized_question_image = serializers.serialize('json', [new_question_image], fields=('text'))
 			return HttpResponse(serialized_question_image, mimetype="application/json")
-	else:
-		raise Http500
+		else:
+			raise Http500
 
 	elif request.method == 'OPTIONS':
 		# Enable CORS (Cross-Origin Resource Sharing)
@@ -285,6 +285,9 @@ def question_image_create_api(request, question_id):
 		# http://www.w3.org/TR/cors/#introduction
 		response['Access-Control-Max-Age'] = '3600'
 		#response['Access-Control-Allow-Methods'] = 'DELETE'
+
+	else:
+		raise Http404
 
 @csrf_exempt
 def hypothesis_read(request, hypothesis_id):

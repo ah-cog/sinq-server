@@ -22,7 +22,7 @@ class QuestionVideo(models.Model):
 
 class Hypothesis(models.Model):
 	# Dependencies (i.e., parent)
-	question = models.ManyToManyField('Question', blank=True, null=True)
+	questions = models.ManyToManyField('Question', blank=True, null=True)
 
 	# Properties
 	cause = models.TextField()
@@ -31,7 +31,7 @@ class Hypothesis(models.Model):
 	text = models.TextField()
 
 	def __unicode__(self):
-		return self.text
+		return "Cause: %s => Effect: %s" % (self.cause, self.effect)
 
 class HypothesisImage(models.Model):
 	#hypothesis = models.ManyToManyField('Hypothesis')

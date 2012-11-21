@@ -398,7 +398,6 @@ def hypothesis_image_create_api(request, hypothesis_id):
 	else:
 		raise Http500
 
-@csrf_exempt
 def question_image_read(request, question_id):
 	if request.method == 'GET':
 		try:
@@ -417,6 +416,39 @@ def question_image_read(request, question_id):
 			response = HttpResponse(serialized_questions, mimetype="application/json")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
+
+	elif request.method == 'OPTIONS':
+		# Enable CORS (Cross-Origin Resource Sharing)
+		# http://enable-cors.org/#how-gae
+		# - This must be added to headers to enable requests from origins other 
+		#   than Google (i.e., wherever students host their websites).
+		#self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+		response = HttpResponse()
+		response['Access-Control-Allow-Origin'] = '*'
+		
+		# Enable access to the DELETE HTTP request method cross-origin
+		# http://www.w3.org/TR/cors/#introduction
+		response['Access-Control-Max-Age'] = '3600'
+		#response['Access-Control-Allow-Methods'] = 'DELETE'
+
+@csrf_exempt
+def question_image_read_api(request, question_id):
+	if request.method == 'GET':
+		try:
+			question = Question.objects.get(id=question_id)
+			question_images = QuestionImage.objects.filter(question_id=question.id)
+		except:
+			raise Http404
+
+		# Retreive request data
+		format = request.GET['format'] if 'format' in request.GET else None
+
+		# Serialize questions in JSON format
+		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
+		serialized_questions = serializers.serialize('json', question_images)
+		response = HttpResponse(serialized_questions, mimetype="application/json")
+		response['Access-Control-Allow-Origin'] = '*'
+		return response
 
 	elif request.method == 'OPTIONS':
 		# Enable CORS (Cross-Origin Resource Sharing)

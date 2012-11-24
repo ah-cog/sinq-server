@@ -126,7 +126,7 @@ def question_create(request):
 		)
 
 @csrf_exempt
-def question_read_api(request):
+def questions_read_api(request):
 	if request.method == 'GET':
 
 		# Retreive request data
@@ -139,6 +139,37 @@ def question_read_api(request):
 		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
 		serialized_questions = serializers.serialize('json', latest_question_list, fields=('text'))
 		response = HttpResponse(serialized_questions, mimetype="application/json")
+		response['Access-Control-Allow-Origin'] = '*'
+		return response
+
+	elif request.method == 'OPTIONS':
+		# Enable CORS (Cross-Origin Resource Sharing)
+		# http://enable-cors.org/#how-gae
+		# - This must be added to headers to enable requests from origins other 
+		#   than Google (i.e., wherever students host their websites).
+		#self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+		response = HttpResponse()
+		response['Access-Control-Allow-Origin'] = '*'
+		
+		# Enable access to the DELETE HTTP request method cross-origin
+		# http://www.w3.org/TR/cors/#introduction
+		response['Access-Control-Max-Age'] = '3600'
+		#response['Access-Control-Allow-Methods'] = 'DELETE'
+
+@csrf_exempt
+def causeandeffects_read_api(request):
+	if request.method == 'GET':
+
+		# Retreive request data
+		format = request.GET['format'] if 'format' in request.GET else None
+
+		latest_causeandeffect_list = CauseAndEffect.objects.all()
+		#.order_by('-creation_timestamp')[:5]
+
+		# Serialize questions in JSON format
+		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
+		serialized_causeandeffects = serializers.serialize('json', latest_causeandeffect_list, fields=('text'))
+		response = HttpResponse(serialized_causeandeffects, mimetype="application/json")
 		response['Access-Control-Allow-Origin'] = '*'
 		return response
 
@@ -501,6 +532,39 @@ def question_image_read_api(request, question_id):
 		#response['Access-Control-Allow-Methods'] = 'DELETE'
 
 @csrf_exempt
+def causeandeffect_image_read_api(request, causeandeffect_id):
+	if request.method == 'GET':
+		try:
+			causeandeffect = CauseAndEffect.objects.get(id=causeandeffect_id)
+			causeandeffect_images = CauseAndEffectImage.objects.filter(causeandeffect_id=causeandeffect.id)
+		except:
+			raise Http404
+
+		# Retreive request data
+		format = request.GET['format'] if 'format' in request.GET else None
+
+		# Serialize questions in JSON format
+		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
+		serialized_causeandeffect_images = serializers.serialize('json', causeandeffect_images)
+		response = HttpResponse(serialized_causeandeffect_images, mimetype="application/json")
+		response['Access-Control-Allow-Origin'] = '*'
+		return response
+
+	elif request.method == 'OPTIONS':
+		# Enable CORS (Cross-Origin Resource Sharing)
+		# http://enable-cors.org/#how-gae
+		# - This must be added to headers to enable requests from origins other 
+		#   than Google (i.e., wherever students host their websites).
+		#self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+		response = HttpResponse()
+		response['Access-Control-Allow-Origin'] = '*'
+		
+		# Enable access to the DELETE HTTP request method cross-origin
+		# http://www.w3.org/TR/cors/#introduction
+		response['Access-Control-Max-Age'] = '3600'
+		#response['Access-Control-Allow-Methods'] = 'DELETE'
+
+@csrf_exempt
 def causeandeffects_index(request):
 	if request.method == 'GET':
 
@@ -626,12 +690,12 @@ def investigation_create_api(request):
 
 		try:
 			#data = json_data[0]
-			investigation_data = json_data['causeandeffect']
+			investigation_data = json_data['investigation']
 
 			# return HttpResponse(causeandeffect_json)
 
-			causeandeffect = CauseAndEffect(cause = investigation_data['cause_text'], effect = investigation_data['effect_text'])
-			causeandeffect.save()
+			investigation = Investigation() #(cause = investigation_data['cause_text'], effect = investigation_data['effect_text'])
+			investigation.save()
 			# Set up many-to-many associations after saving the object
 			# if causeandeffect_data.contains('question_id'):
 			# 	question_id = causeandeffect_data['question_id']
@@ -639,10 +703,20 @@ def investigation_create_api(request):
 			# 	causeandeffect.question.add(question)
 			# 	causeandeffect.save() # Save the many-to-many relationship
 
+			# Create steps
+			for step in investigation_data['steps']:
+				# step.text
+				# step.number
+				investigation_step = InvestigationStep()
+				investigation_step.investigation = investigation
+				investigation_step.number = step['number']
+				investigation_step.text = step['text']
+				investigation_step.save()
+
 			# Serialize cause-and-effets in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-			serialized_causeandeffects = serializers.serialize('json', [causeandeffect], fields=('cause_text', 'effect_text'))
-			return HttpResponse(serialized_causeandeffects, mimetype="application/json")
+			serialized_investigations = serializers.serialize('json', [investigation], fields=('cause_text', 'effect_text'))
+			return HttpResponse(serialized_investigations, mimetype="application/json")
 
 		except KeyError:
 			HttpResponseServerError("Malformed cause-and-effect data!")
@@ -651,3 +725,34 @@ def investigation_create_api(request):
 
 	else:
 		HttpResponseServerError("Not POST.  Must POST to this URL.")
+
+@csrf_exempt
+def investigations_read_api(request):
+	if request.method == 'GET':
+
+		# Retreive request data
+		format = request.GET['format'] if 'format' in request.GET else None
+
+		latest_investigation_list = Investigation.objects.all()
+		#.order_by('-creation_timestamp')[:5]
+
+		# Serialize questions in JSON format
+		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
+		serialized_investigations = serializers.serialize('json', latest_investigation_list, fields=('text'))
+		response = HttpResponse(serialized_investigations, mimetype="application/json")
+		response['Access-Control-Allow-Origin'] = '*'
+		return response
+
+	elif request.method == 'OPTIONS':
+		# Enable CORS (Cross-Origin Resource Sharing)
+		# http://enable-cors.org/#how-gae
+		# - This must be added to headers to enable requests from origins other 
+		#   than Google (i.e., wherever students host their websites).
+		#self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+		response = HttpResponse()
+		response['Access-Control-Allow-Origin'] = '*'
+		
+		# Enable access to the DELETE HTTP request method cross-origin
+		# http://www.w3.org/TR/cors/#introduction
+		response['Access-Control-Max-Age'] = '3600'
+		#response['Access-Control-Allow-Methods'] = 'DELETE'

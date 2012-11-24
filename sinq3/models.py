@@ -54,8 +54,11 @@ class CauseAndEffect(models.Model):
 	def __unicode__(self):
 		return "Cause: %s => Effect: %s" % (self.cause, self.effect)
 
+def get_default_cause_and_effect():
+	return CauseAndEffect.objects.all()[0] # TODO: Create a "default" CauseAndEffect rather than one with id=1
+
 class CauseAndEffectImage(models.Model):
-	causeandeffects = models.ManyToManyField('CauseAndEffect', blank=True, null=True)
+	causeandeffect = models.ForeignKey('CauseAndEffect', related_name='images', default=get_default_cause_and_effect)
 
 	image = models.ImageField(upload_to='images/causeandeffects/')
 
@@ -79,6 +82,7 @@ class InvestigationStep(models.Model):
 	# Dependencies
 	investigation = models.ForeignKey('Investigation', related_name='steps')
 
+	number = models.PositiveIntegerField(blank=True, null=True) # Make unique.  Make auto-increment?
 	text = models.TextField()
 
 	# Timestamps

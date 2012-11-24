@@ -1,8 +1,12 @@
 from sinq3.models import Question
 from sinq3.models import QuestionImage
 
-from sinq3.models import Hypothesis
-from sinq3.models import HypothesisImage
+from sinq3.models import CauseAndEffect
+from sinq3.models import CauseAndEffectImage
+
+from sinq3.models import Investigation
+from sinq3.models import InvestigationStep
+from sinq3.models import InvestigationStepImage
 
 from django.http import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
@@ -17,7 +21,7 @@ from django.shortcuts import render_to_response
 # Import forms:
 from sinq3.forms import QuestionForm
 from sinq3.forms import QuestionImageForm
-from sinq3.forms import HypothesisImageForm
+from sinq3.forms import CauseAndEffectImageForm
 
 from django.utils import simplejson
 from django.core import serializers
@@ -37,19 +41,20 @@ def home(request):
 	# Retreive request data
 	format = request.GET['format'] if 'format' in request.GET else None
 
-	latest_question_list = Question.objects.all()
+	# latest_question_list = Question.objects.all()
 	#.order_by('-creation_timestamp')[:5]
 
 	#if len(latest_question_list) > 0: # this is not efficient, use next line:
-	if latest_question_list.count() > 0:
-		output = ', '.join([q.text for q in latest_question_list])
-	else:
-		output = 'No questions!'
+	# if latest_question_list.count() > 0:
+	# 	output = ', '.join([q.text for q in latest_question_list])
+	# else:
+	# 	output = 'No questions!'
 	t = loader.get_template('home.html')
-	c = Context({
-			'latest_question_list': latest_question_list,
-			'format': format
-		})
+	# c = Context({
+	# 		'latest_question_list': latest_question_list,
+	# 		'format': format
+	# 	})
+	c = Context({})
 	return HttpResponse(t.render(c))
 
 @csrf_exempt
@@ -119,6 +124,37 @@ def question_create(request):
 			},
 			context_instance=RequestContext(request)
 		)
+
+@csrf_exempt
+def question_read_api(request):
+	if request.method == 'GET':
+
+		# Retreive request data
+		format = request.GET['format'] if 'format' in request.GET else None
+
+		latest_question_list = Question.objects.all()
+		#.order_by('-creation_timestamp')[:5]
+
+		# Serialize questions in JSON format
+		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
+		serialized_questions = serializers.serialize('json', latest_question_list, fields=('text'))
+		response = HttpResponse(serialized_questions, mimetype="application/json")
+		response['Access-Control-Allow-Origin'] = '*'
+		return response
+
+	elif request.method == 'OPTIONS':
+		# Enable CORS (Cross-Origin Resource Sharing)
+		# http://enable-cors.org/#how-gae
+		# - This must be added to headers to enable requests from origins other 
+		#   than Google (i.e., wherever students host their websites).
+		#self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+		response = HttpResponse()
+		response['Access-Control-Allow-Origin'] = '*'
+		
+		# Enable access to the DELETE HTTP request method cross-origin
+		# http://www.w3.org/TR/cors/#introduction
+		response['Access-Control-Max-Age'] = '3600'
+		#response['Access-Control-Allow-Methods'] = 'DELETE'
 
 @csrf_exempt
 def question_create_api(request):
@@ -290,11 +326,11 @@ def question_image_create_api(request, question_id):
 		raise Http404
 
 @csrf_exempt
-def hypothesis_read(request, hypothesis_id):
+def causeandeffect_read(request, causeandeffect_id):
 
 	if request.method == 'GET':
 		try:
-			hypothesis = Hypothesis.objects.get(id=hypothesis_id)
+			causeandeffect = CauseAndEffect.objects.get(id=causeandeffect_id)
 		except:
 			raise Http404
 
@@ -304,16 +340,16 @@ def hypothesis_read(request, hypothesis_id):
 		if format == 'json':
 			# Serialize questions in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-			serialized_hypotheses = serializers.serialize('json', [hypothesis], fields=('cause', 'effect'))
-			response = HttpResponse(serialized_hypotheses, mimetype="application/json")
+			serialized_causeandeffects = serializers.serialize('json', [causeandeffect], fields=('cause', 'effect'))
+			response = HttpResponse(serialized_causeandeffects, mimetype="application/json")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 
 		else:
 			# Display the question
-			t = loader.get_template('hypotheses/hypothesis_view.html')
+			t = loader.get_template('causeandeffects/causeandeffect_view.html')
 			c = Context({
-					'hypothesis': hypothesis
+					'causeandeffect': causeandeffect
 				})
 
 			return HttpResponse(t.render(c))
@@ -333,11 +369,11 @@ def hypothesis_read(request, hypothesis_id):
 		#response['Access-Control-Allow-Methods'] = 'DELETE'
 
 @csrf_exempt
-def hypothesis_read_api(request, hypothesis_id):
+def causeandeffect_read_api(request, causeandeffect_id):
 
 	if request.method == 'GET':
 		try:
-			hypothesis = Hypothesis.objects.get(id=hypothesis_id)
+			causeandeffect = CauseAndEffect.objects.get(id=causeandeffect_id)
 		except:
 			raise Http404
 
@@ -347,8 +383,8 @@ def hypothesis_read_api(request, hypothesis_id):
 		if format == 'json':
 			# Serialize questions in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-			serialized_hypotheses = serializers.serialize('json', [hypothesis], fields=('cause', 'effect'))
-			response = HttpResponse(serialized_hypotheses, mimetype="application/json")
+			serialized_causeandeffects = serializers.serialize('json', [causeandeffect], fields=('cause', 'effect'))
+			response = HttpResponse(serialized_causeandeffects, mimetype="application/json")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 
@@ -370,30 +406,30 @@ def hypothesis_read_api(request, hypothesis_id):
 		#response['Access-Control-Allow-Methods'] = 'DELETE'
 
 @csrf_exempt
-def hypothesis_image_create_api(request, hypothesis_id):
+def causeandeffect_image_create_api(request, causeandeffect_id):
 	# Get question to which the image will be attached.
 	try:
-		hypothesis = Hypothesis.objects.get(id=hypothesis_id)
+		causeandeffect = CauseAndEffect.objects.get(id=causeandeffect_id)
 	except:
 		raise Http404
 
 	# Save photo if POST
 	if request.method == 'POST':
-		form = HypothesisImageForm(request.POST, request.FILES)
+		form = CauseAndEffectImageForm(request.POST, request.FILES)
 
 		if form.is_valid():
 			# Create new question image and store in DB
-			new_hypothesis_image            = HypothesisImage(image = request.FILES['hypothesis_image'])
-			new_hypothesis_image.hypothesis = hypothesis
-			new_hypothesis_image.save()
-			# if request.FILES.has_key('hypothesis_image'):
+			new_causeandeffect_image            = CauseAndEffectImage(image = request.FILES['causeandeffect_image'])
+			new_causeandeffect_image.causeandeffect = causeandeffect
+			new_causeandeffect_image.save()
+			# if request.FILES.has_key('causeandeffect_image'):
 			# 	return HttpResponse('its there', mimetype="text/plain")
 			# else:
 			# 	return HttpResponse('nope', mimetype="text/plain")
 
 			# Serialize questions in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-			serialized_question_image = serializers.serialize('json', [new_hypothesis_image], fields=('text'))
+			serialized_question_image = serializers.serialize('json', [new_causeandeffect_image], fields=('text'))
 			return HttpResponse(serialized_question_image, mimetype="application/json")
 	else:
 		raise Http500
@@ -465,33 +501,33 @@ def question_image_read_api(request, question_id):
 		#response['Access-Control-Allow-Methods'] = 'DELETE'
 
 @csrf_exempt
-def hypotheses_index(request):
+def causeandeffects_index(request):
 	if request.method == 'GET':
 
 		# Retreive request data
 		format = request.GET['format'] if 'format' in request.GET else None
 
-		latest_hypothesis_list = Hypothesis.objects.all()
+		latest_causeandeffect_list = CauseAndEffect.objects.all()
 		#.order_by('-creation_timestamp')[:5]
 
 		if format == 'json':
 			# Serialize questions in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-			serialized_hypotheses = serializers.serialize('json', latest_hypothesis_list, fields=('cause', 'effect'))
-			response = HttpResponse(serialized_hypotheses, mimetype="application/json")
+			serialized_causeandeffects = serializers.serialize('json', latest_causeandeffect_list, fields=('cause', 'effect'))
+			response = HttpResponse(serialized_causeandeffects, mimetype="application/json")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 
 
 		else:
 			#if len(latest_question_list) > 0: # this is not efficient, use next line:
-			if latest_hypothesis_list.count() > 0:
-				output = ', '.join([q.text for q in latest_hypothesis_list])
+			if latest_causeandeffect_list.count() > 0:
+				output = ', '.join([q.text for q in latest_causeandeffect_list])
 			else:
-				output = 'No hypotheses!'
-			t = loader.get_template('hypotheses/index.html')
+				output = 'No cause-and-effects!'
+			t = loader.get_template('causeandeffects/index.html')
 			c = Context({
-					'latest_hypothesis_list': latest_hypothesis_list,
+					'latest_causeandeffect_list': latest_causeandeffect_list,
 					'format': format
 				})
 			return HttpResponse(t.render(c))
@@ -511,34 +547,34 @@ def hypotheses_index(request):
 		#response['Access-Control-Allow-Methods'] = 'DELETE'
 
 @csrf_exempt
-def hypothesis_create_api(request):
+def causeandeffect_create_api(request):
 	if request.method == 'POST':
 
-		hypothesis_json = request.body
-		json_data = simplejson.loads(hypothesis_json)
+		causeandeffect_json = request.body
+		json_data = simplejson.loads(causeandeffect_json)
 
 		try:
 			#data = json_data[0]
-			hypothesis_data = json_data['hypothesis']
+			causeandeffect_data = json_data['causeandeffect']
 
-			# return HttpResponse(hypothesis_json)
+			# return HttpResponse(causeandeffect_json)
 
-			hypothesis = Hypothesis(cause = hypothesis_data['cause_text'], effect = hypothesis_data['effect_text'])
-			hypothesis.save()
+			causeandeffect = CauseAndEffect(cause = causeandeffect_data['cause_text'], effect = causeandeffect_data['effect_text'])
+			causeandeffect.save()
 			# Set up many-to-many associations after saving the object
-			# if hypothesis_data.contains('question_id'):
-			# 	question_id = hypothesis_data['question_id']
+			# if causeandeffect_data.contains('question_id'):
+			# 	question_id = causeandeffect_data['question_id']
 			# 	question = Question.objects.get(id=question_id)
-			# 	hypothesis.question.add(question)
-			# 	hypothesis.save() # Save the many-to-many relationship
+			# 	causeandeffect.question.add(question)
+			# 	causeandeffect.save() # Save the many-to-many relationship
 
-			# Serialize hypotheses in JSON format
+			# Serialize cause-and-effects in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-			serialized_hypotheses = serializers.serialize('json', [hypothesis], fields=('cause_text', 'effect_text'))
-			return HttpResponse(serialized_hypotheses, mimetype="application/json")
+			serialized_causeandeffects = serializers.serialize('json', [causeandeffect], fields=('cause_text', 'effect_text'))
+			return HttpResponse(serialized_causeandeffects, mimetype="application/json")
 
 		except KeyError:
-			HttpResponseServerError("Malformed hypothesis data!")
+			HttpResponseServerError("Malformed cause-and-effect data!")
 
 		return HttpResponse(object)
 
@@ -546,13 +582,13 @@ def hypothesis_create_api(request):
 		HttpResponseServerError("Not POST.  Must POST to this URL.")
 
 @csrf_exempt
-def hypothesis_image_read(request, hypothesis_id):
+def causeandeffect_image_read(request, causeandeffect_id):
 	if request.method == 'GET':
 		try:
-			hypothesis = Hypothesis.objects.get(id=hypothesis_id)
-			#hypothesis_images = Hypothesis.objects.get(id=hypothesis_id).hypothesis_set.all();
-			hypothesis_images = HypothesisImage.objects.filter(hypothesis_id=hypothesis.id)
-			#hypothesis_images = HypothesisImage.objects.filter(hypothesis__id__exact=hypothesis_id)
+			causeandeffect = CauseAndEffect.objects.get(id=causeandeffect_id)
+			#causeandeffect_images = CauseAndEffect.objects.get(id=causeandeffect_id).causeandeffect_set.all();
+			causeandeffect_images = CauseAndEffectImage.objects.filter(causeandeffect_id=causeandeffect.id)
+			#causeandeffect_images = CauseAndEffectImage.objects.filter(causeandeffect__id__exact=causeandeffect_id)
 		except:
 			raise Http404
 
@@ -562,8 +598,8 @@ def hypothesis_image_read(request, hypothesis_id):
 		if format == 'json':
 			# Serialize questions in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-			serialized_hypotheses = serializers.serialize('json', hypothesis_images)
-			response = HttpResponse(serialized_hypotheses, mimetype="application/json")
+			serialized_causeandeffects = serializers.serialize('json', causeandeffect_images)
+			response = HttpResponse(serialized_causeandeffects, mimetype="application/json")
 			response['Access-Control-Allow-Origin'] = '*'
 			return response
 
@@ -580,3 +616,38 @@ def hypothesis_image_read(request, hypothesis_id):
 		# http://www.w3.org/TR/cors/#introduction
 		response['Access-Control-Max-Age'] = '3600'
 		#response['Access-Control-Allow-Methods'] = 'DELETE'
+
+@csrf_exempt
+def investigation_create_api(request):
+	if request.method == 'POST':
+
+		investigation_json = request.body
+		json_data = simplejson.loads(investigation_json)
+
+		try:
+			#data = json_data[0]
+			investigation_data = json_data['causeandeffect']
+
+			# return HttpResponse(causeandeffect_json)
+
+			causeandeffect = CauseAndEffect(cause = investigation_data['cause_text'], effect = investigation_data['effect_text'])
+			causeandeffect.save()
+			# Set up many-to-many associations after saving the object
+			# if causeandeffect_data.contains('question_id'):
+			# 	question_id = causeandeffect_data['question_id']
+			# 	question = Question.objects.get(id=question_id)
+			# 	causeandeffect.question.add(question)
+			# 	causeandeffect.save() # Save the many-to-many relationship
+
+			# Serialize cause-and-effets in JSON format
+			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
+			serialized_causeandeffects = serializers.serialize('json', [causeandeffect], fields=('cause_text', 'effect_text'))
+			return HttpResponse(serialized_causeandeffects, mimetype="application/json")
+
+		except KeyError:
+			HttpResponseServerError("Malformed cause-and-effect data!")
+
+		return HttpResponse(object)
+
+	else:
+		HttpResponseServerError("Not POST.  Must POST to this URL.")

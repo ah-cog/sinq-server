@@ -3,8 +3,8 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('sinq3.views',
 	url(r'^$', 'home'), # /
 
-	url(r'^hypotheses/$', 'hypotheses_index'), # /hypotheses/
-	url(r'^hypotheses/(?P<hypothesis_id>\d+)/images/$', 'hypothesis_image_read'), # /hypotheses/{{ hypothesis.id }}/
+	url(r'^causeandeffects/$', 'causeandeffects_index'), # /causeandeffects/
+	url(r'^causeandeffects/(?P<causeandeffect_id>\d+)/images/$', 'causeandeffect_image_read'), # /causeandeffects/{{ causeandeffect.id }}/
 
 	url(r'^questions/$', 'question_index'), # /questions/
 	url(r'^questions/create/$', 'question_create'), # /questions/create/
@@ -15,12 +15,21 @@ urlpatterns = patterns('sinq3.views',
 
 	url(r'^questions/(?P<question_id>\d+)/images/create/$', 'question_image_create'), # /questions/{{ question.id }}/images/create/
 
-	url(r'^api/hypotheses/create/$', 'hypothesis_create_api'), # /hypotheses/create/
-	url(r'^api/hypotheses/(?P<hypothesis_id>\d+)/$', 'hypothesis_read_api'), # /hypotheses/{{ hypothesis.id }}/
-	url(r'^api/hypotheses/(?P<hypothesis_id>\d+)/images/create/$', 'hypothesis_image_create_api'), # /hypotheses/{{ hypothesis.id }}/images/create/
-	url(r'^api/questions/create/$', 'question_create_api'), # /questions/create/
+
+	# RESTful HTTP API
+
+	url(r'^api/questions/$', 'question_read_api'), # /api/questions/
+	url(r'^api/questions/create/$', 'question_create_api'), # /api/questions/create/
 	url(r'^api/questions/(?P<question_id>\d+)/images/$', 'question_image_read_api'), # /api/questions/?format=json
 	url(r'^api/questions/(?P<question_id>\d+)/images/create/$', 'question_image_create_api'), # /questions/{{ question.id }}/images/create/
+
+	url(r'^api/causeandeffects/create/$', 'causeandeffect_create_api'), # /causeandeffects/create/
+	url(r'^api/causeandeffects/(?P<causeandeffect_id>\d+)/$', 'causeandeffect_read_api'), # /causeandeffects/{{ causeandeffect.id }}/
+	url(r'^api/causeandeffects/(?P<causeandeffect_id>\d+)/images/create/$', 'causeandeffect_image_create_api'), # /causeandeffects/{{ causeandeffect.id }}/images/create/
+
+	url(r'^api/investigations/create/$', 'investigation_create_api'), # /investigations/create/
+	url(r'^api/investigations/(?P<investigations_id>\d+)/steps/create/$', 'investigation_step_create_api'), # /investigations/{{ investigation.id }}/steps/create/
+	url(r'^api/investigations/(?P<investigations_id>\d+)/steps/(?P<steps_id>\d+)/images/create/$', 'investigation_step_image_create_api'), # /investigations/{{ investigation.id }}/steps/{{ step.id }}/images/create/
 
 	# /questions/33/?format=json
 )

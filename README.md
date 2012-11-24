@@ -93,3 +93,7 @@ Restart the Apache web server using the following command:
 	sudo apachectl restart
 
 (For your reference, on my system, apachectl is located at /usr/sbin/apachectl.)
+
+RESTful HTTP API
+================
+

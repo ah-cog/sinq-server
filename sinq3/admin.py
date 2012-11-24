@@ -1,11 +1,11 @@
 # Import SINQ Django project models to be used on the admin page.
 from sinq3.models import Question
 from sinq3.models import QuestionImage
-from sinq3.models import Hypothesis
-from sinq3.models import HypothesisImage
-from sinq3.models import Project
-from sinq3.models import ProjectInstruction
-from sinq3.models import ProjectInstructionImage
+from sinq3.models import CauseAndEffect
+from sinq3.models import CauseAndEffectImage
+from sinq3.models import Investigation
+from sinq3.models import InvestigationStep
+from sinq3.models import InvestigationStepImage
 from django.contrib import admin
 
 # Configure the admin page
@@ -22,9 +22,9 @@ class ProjectAdmin(admin.ModelAdmin):
 admin.site.register(Question)
 admin.site.register(QuestionImage)
 
-admin.site.register(Hypothesis)
-admin.site.register(HypothesisImage)
+admin.site.register(CauseAndEffect)
+admin.site.register(CauseAndEffectImage)
 
-admin.site.register(Project)
-admin.site.register(ProjectInstruction)
-admin.site.register(ProjectInstructionImage)
+admin.site.register(Investigation)
+admin.site.register(InvestigationStep)
+admin.site.register(InvestigationStepImage)

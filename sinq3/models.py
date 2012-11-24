@@ -1,10 +1,26 @@
-import datetime
 from django.db import models
+import datetime
 
-# Create SINQ models here.
+# SINQ database models
 
 class Question(models.Model):
+	# Relations/Dependencies
+	causeandeffects = models.ManyToManyField('CauseAndEffect', blank=True, null=True)
+	investigations  = models.ManyToManyField('Investigation', blank=True, null=True)
+
 	text = models.TextField()
+
+	# Timestamps
+	# http://david.feinzeig.com/blog/2011/12/06/how-to-properly-set-a-default-value-for-a-datetimefield-in-django/
+	# http://stackoverflow.com/questions/2029295/django-datefield-default-options
+	date_created       = models.DateTimeField(editable=False, default=datetime.datetime.now)
+	date_last_modified = models.DateTimeField(default=datetime.datetime.now)
+
+	# def save(self, *args, **kwargs):
+	# 	'''On save, update timestamps.'''
+	# 	if not self.id:
+	# 		self.date_created = datetime.datetime.today()
+	# 	self.date_modified = datetime.datetime.today()
 
 	# Called by Django when printing objects... give it something more helpful for programers to read (pretty print).
 	def __unicode__(self):
@@ -15,61 +31,66 @@ class QuestionImage(models.Model):
 
 	image = models.ImageField(upload_to='images/questions/')
 
-class QuestionVideo(models.Model):
-	question = models.ForeignKey('Question', related_name='videos')
+	# Timestamps
+	date_created       = models.DateTimeField(editable=False, default=datetime.datetime.now)
+	date_last_modified = models.DateTimeField(default=datetime.datetime.now)
 
-	video = models.FileField(upload_to='videos/questions/')
 
-class Hypothesis(models.Model):
-	# Dependencies (i.e., parent)
-	questions = models.ManyToManyField('Question', blank=True, null=True)
+
+
+class CauseAndEffect(models.Model):
+	# Relations/Dependencies
+	questions      = models.ManyToManyField('Question', blank=True, null=True)
+	investigations = models.ManyToManyField('Investigation', blank=True, null=True)
 
 	# Properties
-	cause = models.TextField()
+	cause  = models.TextField()
 	effect = models.TextField()
 
-	text = models.TextField()
+	# Timestamps
+	date_created       = models.DateTimeField(editable=False, default=datetime.datetime.now)
+	date_last_modified = models.DateTimeField(default=datetime.datetime.now)
 
 	def __unicode__(self):
 		return "Cause: %s => Effect: %s" % (self.cause, self.effect)
 
-class HypothesisImage(models.Model):
-	#hypothesis = models.ManyToManyField('Hypothesis')
-	hypothesis = models.ForeignKey('Hypothesis', related_name='images')
+class CauseAndEffectImage(models.Model):
+	causeandeffects = models.ManyToManyField('CauseAndEffect', blank=True, null=True)
 
-	image = models.ImageField(upload_to='images/hypotheses/')
+	image = models.ImageField(upload_to='images/causeandeffects/')
 
-class HypothesisVideo(models.Model):
-	hypothesis = models.ManyToManyField('Hypothesis')
+	# Timestamps
+	date_created       = models.DateTimeField(editable=False, default=datetime.datetime.now)
+	date_last_modified = models.DateTimeField(default=datetime.datetime.now)
 
-	video = models.FileField(upload_to='videos/questions/')
 
-class Project(models.Model):
-	# Dependencies (i.e., parent)
-	hypothesis = models.ForeignKey('Hypothesis', related_name='projects')
 
-	# name = models.TextField()
 
-	creation_timestamp = models.DateTimeField('date published')
-	last_modification_timestamp = models.DateTimeField('date created')
+class Investigation(models.Model):
+	# Relations/Dependencies
+	questions       = models.ManyToManyField('Question', blank=True, null=True)
+	causeandeffects = models.ManyToManyField('CauseAndEffect', blank=True, null=True)
 
-	# Called by Django when printing objects... give it something more helpful for programers to read (pretty print).
-	# def __unicode__(self):
-	# 	return self.name
+	# Timestamps
+	date_created       = models.DateTimeField(editable=False, default=datetime.datetime.now)
+	date_last_modified = models.DateTimeField(default=datetime.datetime.now)
 
-class ProjectInstruction(models.Model):
+class InvestigationStep(models.Model):
 	# Dependencies
-	project = models.ForeignKey('Project', related_name='instructions')
+	investigation = models.ForeignKey('Investigation', related_name='steps')
 
 	text = models.TextField()
 
-class ProjectInstructionImage(models.Model):
+	# Timestamps
+	date_created       = models.DateTimeField(editable=False, default=datetime.datetime.now)
+	date_last_modified = models.DateTimeField(default=datetime.datetime.now)
+
+class InvestigationStepImage(models.Model):
 	# Dependencies
-	project_instruction = models.ForeignKey('ProjectInstruction', related_name='images')
+	step = models.ForeignKey('InvestigationStep', related_name='images')
 
-	image = models.ImageField(upload_to='images/projects/instructions/')
+	image = models.ImageField(upload_to='images/investigations/steps/')
 
-class ProjectInstructionVideo(models.Model):
-	project_instruction = models.ForeignKey('ProjectInstruction', related_name='videos')
-
-	video = models.FileField(upload_to='videos/projects/instructions')
+	# Timestamps
+	date_created       = models.DateTimeField(editable=False, default=datetime.datetime.now)
+	date_last_modified = models.DateTimeField(default=datetime.datetime.now)

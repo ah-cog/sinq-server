@@ -331,30 +331,17 @@ def question_image_create_api(request, question_id):
 			new_question_image          = QuestionImage(image = request.FILES['question_image'])
 			new_question_image.question = question
 			new_question_image.save()
+			# if request.FILES.has_key('causeandeffect_image'):
+			# 	return HttpResponse('its there', mimetype="text/plain")
+			# else:
+			# 	return HttpResponse('nope', mimetype="text/plain")
 
 			# Serialize questions in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
 			serialized_question_image = serializers.serialize('json', [new_question_image], fields=('text'))
 			return HttpResponse(serialized_question_image, mimetype="application/json")
-		else:
-			raise Http500
-
-	elif request.method == 'OPTIONS':
-		# Enable CORS (Cross-Origin Resource Sharing)
-		# http://enable-cors.org/#how-gae
-		# - This must be added to headers to enable requests from origins other 
-		#   than Google (i.e., wherever students host their websites).
-		#self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-		response = HttpResponse()
-		response['Access-Control-Allow-Origin'] = '*'
-		
-		# Enable access to the DELETE HTTP request method cross-origin
-		# http://www.w3.org/TR/cors/#introduction
-		response['Access-Control-Max-Age'] = '3600'
-		#response['Access-Control-Allow-Methods'] = 'DELETE'
-
 	else:
-		raise Http404
+		raise Http500
 
 @csrf_exempt
 def causeandeffect_read(request, causeandeffect_id):

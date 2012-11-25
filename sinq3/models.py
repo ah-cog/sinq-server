@@ -40,7 +40,7 @@ class QuestionImage(models.Model):
 
 class CauseAndEffect(models.Model):
 	# Relations/Dependencies
-	questions      = models.ManyToManyField('Question', blank=True, null=True)
+	#questions      = models.ManyToManyField('Question', blank=True, null=True)
 	investigations = models.ManyToManyField('Investigation', blank=True, null=True)
 
 	# Properties
@@ -71,8 +71,8 @@ class CauseAndEffectImage(models.Model):
 
 class Investigation(models.Model):
 	# Relations/Dependencies
-	questions       = models.ManyToManyField('Question', blank=True, null=True)
-	causeandeffects = models.ManyToManyField('CauseAndEffect', blank=True, null=True)
+	# questions       = models.ManyToManyField('Question', blank=True, null=True)
+	# causeandeffects = models.ManyToManyField('CauseAndEffect', blank=True, null=True)
 
 	# Timestamps
 	date_created       = models.DateTimeField(editable=False, default=datetime.datetime.now)

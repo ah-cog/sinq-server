@@ -31,8 +31,9 @@ urlpatterns = patterns('sinq3.views',
 
 	url(r'^api/investigations/$', 'investigations_read_api'), # /api/investigations/
 	url(r'^api/investigations/create/$', 'investigation_create_api'), # /investigations/create/
-	url(r'^api/investigations/(?P<investigations_id>\d+)/steps/create/$', 'investigation_step_create_api'), # /investigations/{{ investigation.id }}/steps/create/
-	url(r'^api/investigations/(?P<investigations_id>\d+)/steps/(?P<steps_id>\d+)/images/create/$', 'investigation_step_image_create_api'), # /investigations/{{ investigation.id }}/steps/{{ step.id }}/images/create/
+	url(r'^api/investigations/(?P<investigation_id>\d+)/steps/$', 'investigation_step_read_api'), # /investigations/{{ investigation.id }}/steps/
+	url(r'^api/investigations/(?P<investigation_id>\d+)/steps/create/$', 'investigation_step_create_api'), # /investigations/{{ investigation.id }}/steps/create/
+	url(r'^api/investigations/(?P<investigation_id>\d+)/steps/(?P<steps_id>\d+)/images/create/$', 'investigation_step_image_create_api'), # /investigations/{{ investigation.id }}/steps/{{ step.id }}/images/create/
 
 	# /questions/33/?format=json
 )

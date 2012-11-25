@@ -131,9 +131,20 @@ def questions_read_api(request):
 
 		# Retreive request data
 		format = request.GET['format'] if 'format' in request.GET else None
+		causeandeffect_id = request.GET['causeandeffect_id'] if 'causeandeffect_id' in request.GET else None
+		investigation_id = request.GET['investigation_id'] if 'investigation_id' in request.GET else None
 
-		latest_question_list = Question.objects.all()
-		#.order_by('-creation_timestamp')[:5]
+		latest_investigation_list = Investigation.objects.all()
+
+		latest_question_list = Question.objects.all() #.order_by('-date_last_modified')[:5]
+
+		# Create association to cause-and-effect
+		if causeandeffect_id != None:
+			latest_question_list = latest_question_list.filter(causeandeffects__pk=causeandeffect_id)
+
+		# Create association to cause-and-effect
+		if investigation_id != None:
+			latest_question_list = latest_question_list.filter(investigations__pk=investigation_id)
 
 		# Serialize questions in JSON format
 		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
@@ -162,13 +173,22 @@ def causeandeffects_read_api(request):
 
 		# Retreive request data
 		format = request.GET['format'] if 'format' in request.GET else None
+		question_id = request.GET['question_id'] if 'question_id' in request.GET else None
+		investigation_id = request.GET['investigation_id'] if 'investigation_id' in request.GET else None
 
 		latest_causeandeffect_list = CauseAndEffect.objects.all()
-		#.order_by('-creation_timestamp')[:5]
+
+		# Create association to question
+		if question_id != None:
+			latest_causeandeffect_list = latest_causeandeffect_list.filter(question__pk=question_id)
+
+		# Create association to cause-and-effect
+		if investigation_id != None:
+			latest_causeandeffect_list = latest_causeandeffect_list.filter(investigations__pk=investigation_id)
 
 		# Serialize questions in JSON format
 		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-		serialized_causeandeffects = serializers.serialize('json', latest_causeandeffect_list, fields=('text'))
+		serialized_causeandeffects = serializers.serialize('json', latest_causeandeffect_list, fields=('cause', 'effect'))
 		response = HttpResponse(serialized_causeandeffects, mimetype="application/json")
 		response['Access-Control-Allow-Origin'] = '*'
 		return response
@@ -200,6 +220,16 @@ def question_create_api(request):
 
 			question = Question(text = question_data['text'])
 			question.save()
+
+			if question_data.has_key('causeandeffect_id'):
+				causeandeffect = CauseAndEffect.objects.get(id=question_data['causeandeffect_id'])
+				if causeandeffect:
+					question.causeandeffects.add(causeandeffect)
+
+			if question_data.has_key('investigation_id'):
+				investigation = Investigation.objects.get(id=question_data['investigation_id'])
+				if investigation:
+					question.investigations.add(investigation)
 
 			# Serialize questions in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
@@ -328,7 +358,8 @@ def question_image_create_api(request, question_id):
 
 		if form.is_valid():
 			# Create new question image and store in DB
-			new_question_image          = QuestionImage(image = request.FILES['question_image'])
+			new_question_image          = QuestionImage()
+			new_question_image.image    = request.FILES['question_image']
 			new_question_image.question = question
 			new_question_image.save()
 			# if request.FILES.has_key('causeandeffect_image'):
@@ -437,7 +468,8 @@ def causeandeffect_image_create_api(request, causeandeffect_id):
 
 		if form.is_valid():
 			# Create new question image and store in DB
-			new_causeandeffect_image            = CauseAndEffectImage(image = request.FILES['causeandeffect_image'])
+			new_causeandeffect_image          = CauseAndEffectImage()
+			new_causeandeffect_image.image    = request.FILES['causeandeffect_image']
 			new_causeandeffect_image.causeandeffect = causeandeffect
 			new_causeandeffect_image.save()
 			# if request.FILES.has_key('causeandeffect_image'):
@@ -447,8 +479,8 @@ def causeandeffect_image_create_api(request, causeandeffect_id):
 
 			# Serialize questions in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-			serialized_question_image = serializers.serialize('json', [new_causeandeffect_image], fields=('text'))
-			return HttpResponse(serialized_question_image, mimetype="application/json")
+			serialized_causeandeffect_image = serializers.serialize('json', [new_causeandeffect_image], fields=('text'))
+			return HttpResponse(serialized_causeandeffect_image, mimetype="application/json")
 	else:
 		raise Http500
 
@@ -501,6 +533,39 @@ def question_image_read_api(request, question_id):
 		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
 		serialized_questions = serializers.serialize('json', question_images)
 		response = HttpResponse(serialized_questions, mimetype="application/json")
+		response['Access-Control-Allow-Origin'] = '*'
+		return response
+
+	elif request.method == 'OPTIONS':
+		# Enable CORS (Cross-Origin Resource Sharing)
+		# http://enable-cors.org/#how-gae
+		# - This must be added to headers to enable requests from origins other 
+		#   than Google (i.e., wherever students host their websites).
+		#self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+		response = HttpResponse()
+		response['Access-Control-Allow-Origin'] = '*'
+		
+		# Enable access to the DELETE HTTP request method cross-origin
+		# http://www.w3.org/TR/cors/#introduction
+		response['Access-Control-Max-Age'] = '3600'
+		#response['Access-Control-Allow-Methods'] = 'DELETE'
+
+@csrf_exempt
+def investigation_step_read_api(request, investigation_id):
+	if request.method == 'GET':
+		try:
+			investigation = Investigation.objects.get(id=investigation_id)
+			investigation_steps = InvestigationStep.objects.filter(investigation_id=investigation.id).order_by('number')
+		except:
+			raise Http404
+
+		# Retreive request data
+		format = request.GET['format'] if 'format' in request.GET else None
+
+		# Serialize questions in JSON format
+		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
+		serialized_investigation_steps = serializers.serialize('json', investigation_steps)
+		response = HttpResponse(serialized_investigation_steps, mimetype="application/json")
 		response['Access-Control-Allow-Origin'] = '*'
 		return response
 
@@ -612,16 +677,21 @@ def causeandeffect_create_api(request):
 
 			causeandeffect = CauseAndEffect(cause = causeandeffect_data['cause_text'], effect = causeandeffect_data['effect_text'])
 			causeandeffect.save()
+
 			# Set up many-to-many associations after saving the object
-			# if causeandeffect_data.contains('question_id'):
-			# 	question_id = causeandeffect_data['question_id']
-			# 	question = Question.objects.get(id=question_id)
-			# 	causeandeffect.question.add(question)
-			# 	causeandeffect.save() # Save the many-to-many relationship
+			if causeandeffect_data.has_key('question_id'):
+				question = Question.objects.get(id=causeandeffect_data['question_id'])
+				if question:
+					causeandeffect.question_set.add(question)
+
+			if question_data.has_key('investigation_id'):
+				investigation = Investigation.objects.get(id=question_data['investigation_id'])
+				if investigation:
+					causeandeffect.investigations.add(investigation)
 
 			# Serialize cause-and-effects in JSON format
 			# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-			serialized_causeandeffects = serializers.serialize('json', [causeandeffect], fields=('cause_text', 'effect_text'))
+			serialized_causeandeffects = serializers.serialize('json', [causeandeffect], fields=('cause', 'effect'))
 			return HttpResponse(serialized_causeandeffects, mimetype="application/json")
 
 		except KeyError:
@@ -683,12 +753,17 @@ def investigation_create_api(request):
 
 			investigation = Investigation() #(cause = investigation_data['cause_text'], effect = investigation_data['effect_text'])
 			investigation.save()
+
 			# Set up many-to-many associations after saving the object
-			# if causeandeffect_data.contains('question_id'):
-			# 	question_id = causeandeffect_data['question_id']
-			# 	question = Question.objects.get(id=question_id)
-			# 	causeandeffect.question.add(question)
-			# 	causeandeffect.save() # Save the many-to-many relationship
+			if investigation_data.has_key('question_id'):
+				question = Question.objects.get(id=investigation_data['question_id'])
+				if question:
+					investigation.question_set.add(question)
+
+			if investigation_data.has_key('causeandeffect_id'):
+				causeandeffect = CauseAndEffect.objects.get(id=investigation_data['causeandeffect_id'])
+				if causeandeffect:
+					investigation.causeandeffect_set.add(causeandeffect)
 
 			# Create steps
 			for step in investigation_data['steps']:
@@ -719,9 +794,18 @@ def investigations_read_api(request):
 
 		# Retreive request data
 		format = request.GET['format'] if 'format' in request.GET else None
+		question_id = request.GET['question_id'] if 'question_id' in request.GET else None
+		causeandeffect_id = request.GET['causeandeffect_id'] if 'causeandeffect_id' in request.GET else None
 
 		latest_investigation_list = Investigation.objects.all()
-		#.order_by('-creation_timestamp')[:5]
+
+		# Create association to question
+		if question_id != None:
+			latest_investigation_list = latest_investigation_list.filter(question__pk=question_id)
+
+		# Create association to cause-and-effect
+		if causeandeffect_id != None:
+			latest_investigation_list = latest_investigation_list.filter(causeandeffect__pk=causeandeffect_id)
 
 		# Serialize questions in JSON format
 		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/

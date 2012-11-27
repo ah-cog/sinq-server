@@ -678,14 +678,14 @@ def causeandeffect_create_api(request):
 			causeandeffect = CauseAndEffect(cause = causeandeffect_data['cause_text'], effect = causeandeffect_data['effect_text'])
 			causeandeffect.save()
 
-			# Set up many-to-many associations after saving the object
+			# # Set up many-to-many associations after saving the object
 			if causeandeffect_data.has_key('question_id'):
 				question = Question.objects.get(id=causeandeffect_data['question_id'])
 				if question:
 					causeandeffect.question_set.add(question)
 
-			if question_data.has_key('investigation_id'):
-				investigation = Investigation.objects.get(id=question_data['investigation_id'])
+			if causeandeffect_data.has_key('investigation_id'):
+				investigation = Investigation.objects.get(id=causeandeffect_data['investigation_id'])
 				if investigation:
 					causeandeffect.investigations.add(investigation)
 
@@ -797,19 +797,19 @@ def investigations_read_api(request):
 		question_id = request.GET['question_id'] if 'question_id' in request.GET else None
 		causeandeffect_id = request.GET['causeandeffect_id'] if 'causeandeffect_id' in request.GET else None
 
-		latest_investigation_list = Investigation.objects.all()
+		investigations = Investigation.objects.all()
 
 		# Create association to question
 		if question_id != None:
-			latest_investigation_list = latest_investigation_list.filter(question__pk=question_id)
+			investigations = investigations.filter(question__pk=question_id)
 
 		# Create association to cause-and-effect
 		if causeandeffect_id != None:
-			latest_investigation_list = latest_investigation_list.filter(causeandeffect__pk=causeandeffect_id)
+			investigations = investigations.filter(causeandeffect__pk=causeandeffect_id)
 
 		# Serialize questions in JSON format
 		# i.e., https://docs.djangoproject.com/en/dev/topics/serialization/
-		serialized_investigations = serializers.serialize('json', latest_investigation_list, fields=('text'))
+		serialized_investigations = serializers.serialize('json', investigations)
 		response = HttpResponse(serialized_investigations, mimetype="application/json")
 		response['Access-Control-Allow-Origin'] = '*'
 		return response

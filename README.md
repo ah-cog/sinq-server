@@ -1,65 +1,74 @@
 SINQ
 ====
-
 SINQ (Scientific INQuery) is a project from the Human-Computer Interaction Lab at the University of Maryland, College Park.
 
-Configure Server
-================
 
-The SINQ server depends on several software packages.  These are the Apache HTTP Server, PostgreSQL, Python, mod_wsgi, Django, Python Imaging Library (PIL), PyGreSQL.  These must be installed on the server environment.  Once these are installed, they must be configured for SINQ.
 
-Configure Django
-================
+## 1. Installation
 
-Once Django has been installed and configured on your system, you must download and place this SINQ Django project on your system.  For example, on my machine, I placed it at the following location:
+### 1.1 Get Requirements
+
+The SINQ server environment requires several packages to be installed.  They are:
+
+- PostgreSQL
+- Apache HTTP Server
+	- mod_wsgi
+- Python
+	- Django
+	- Python Imaging Library (PIL)
+	- PyGreSQL
+
+
+The [`mod_wsgi`](http://code.google.com/p/modwsgi/) module provides Apache with the [Web Server Gateway Interface](http://wsgi.readthedocs.org/en/latest/). 
+Apache uses this interface to talk to Django, as described in [PEP 333](http://www.python.org/dev/peps/pep-0333/).
+
+
+### 1.2. Download SINQ
+
+Download this project.  On POSIX, Linux, or OS X, we recommend downloading to this location:  
 
 	/usr/local/django/sinq/
 
-This directory contains the following:
+The directory should contain the following:
 
-	./README.md
-	./manage.py
 	./assets/
 	./media/
 	./sinq/
 	./sinq3/
 	./static/
 	./templates/
+	./README.md
+	./manage.py
 
-To configure the Django project, create the following file:
 
-	./sinq/local_settings.py
+## 2. Configuration
 
-Alternatively, modify the settings in the file:
+Once you’ve got the requirements installed, they must be configured for SINQ.
 
-	./sing/settings.py
 
-I recommend creating a the <code>./sinq/local_settings.py</code>.
+### 2.1. Configure Django
 
-Configure Apache Server
-=======================
+* **Recommended:**
+    - Create `./sinq/local_settings.py`
+* **(experts only) Alternative:**
+	- Edit `./sing/settings.py`
+	- Unless you _really_ know what you’re doing, you probably shouldn’t do this. <br />
+	  _Choose this method at your own risk.  You’ve been warned._
 
-Apache must be configured for Django.  On my machine, I configured Apache for Django by installing mod_wsgi (http://code.google.com/p/modwsgi/).  mod_wsgi is software that allows Apache to host Python web applications such as Django.  mod_wsgi does this by providing Apache an interface to Python as specified by the Web Server Gateway Interface (http://wsgi.readthedocs.org/en/latest/index.html) in PEP 333 document (http://www.python.org/dev/peps/pep-0333/).
 
-Add the following lines to your Apache configuration file httpd.conf.
+#### 2.2. Configuration Apache
 
-On Mac OS 10.7.5 (Lion), this file is at the following location:
+Apache’s configuration file is `httpd.conf`.  You’ll need to make a few modifications to it.  
 
-	/etc/apache2/httpd.conf
+On OS X 10.7 (Lion), this file is at the following location `/etc/apache2/httpd.conf`.
 
-The full path to this location is the following:
-
-	/private/etc/apache2/httpd.conf
-
-Add the following lines to your configuration file:
+Add the following to `httpd.conf`:
 
 	Alias /robots.txt /usr/local/django/sinq/robots.txt
 	Alias /favicon.ico /usr/local/django/sinq/favicon.ico
 	Alias /media/ /usr/local/django/sinq/media/
 	Alias /assets/ /usr/local/django/sinq/assets/
 	Alias /static/ /usr/local/django/sinq/static/
-
-Add the following:
 
 	<Directory /usr/local/django/sinq/media/>
 	Order deny,allow
@@ -76,8 +85,6 @@ Add the following:
 	Allow from all
 	</Directory>
 
-Add the following:
-
 	WSGIScriptAlias / /usr/local/django/sinq/sinq/wsgi.py
 	WSGIPythonPath /usr/local/django/sinq
 
@@ -88,12 +95,18 @@ Add the following:
 	</Files>
 	</Directory>
 
-Restart the Apache web server using the following command:
+
+#### 2.3. Restart Apache
+
+The `apachectl` (“Apache Control”) program is used to control Apache. (Surprising, huh?)
+On my system, it’s located at `/usr/sbin/apachectl`.
+
+Run the following:
 
 	sudo apachectl restart
 
-(For your reference, on my system, apachectl is located at /usr/sbin/apachectl.)
+----
 
-RESTful HTTP API
-================
+## RESTful HTTP API
 
+...

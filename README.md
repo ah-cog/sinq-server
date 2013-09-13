@@ -1,12 +1,12 @@
 SINQ
 ====
 
-SINQ (Sientific INQuery) is a project from the Human-Computer Interaction Lab at the University of Maryland, College Park.
+SINQ (Scientific INQuery) is a project from the Human-Computer Interaction Lab at the University of Maryland, College Park.
 
 Configure Server
 ================
 
-The SINQ server depends on several software packages.  These are the Apache HTTP Server, PostgreSQL, Python, mod_wsgi, Django, Python Imaging Library (PIL), PyGreSQL.  These must be installed on the server envirnoment.  Once these are installed, they must be configured for SINQ.
+The SINQ server depends on several software packages.  These are the Apache HTTP Server, PostgreSQL, Python, mod_wsgi, Django, Python Imaging Library (PIL), PyGreSQL.  These must be installed on the server environment.  Once these are installed, they must be configured for SINQ.
 
 Configure Django
 ================
@@ -39,7 +39,7 @@ I recommend creating a the <code>./sinq/local_settings.py</code>.
 Configure Apache Server
 =======================
 
-Apache must be configured for Django.  On my machine, I conifgured APache for Django by installing mod_wsgi (http://code.google.com/p/modwsgi/).  mod_wsgi is software that allows Apache to host Python web applications such as Django.  mod_wsgi does this by providing Apache an interface to Python as specified by the Web Server Gateway Interface (http://wsgi.readthedocs.org/en/latest/index.html) in PEP 333 document (http://www.python.org/dev/peps/pep-0333/).
+Apache must be configured for Django.  On my machine, I configured Apache for Django by installing mod_wsgi (http://code.google.com/p/modwsgi/).  mod_wsgi is software that allows Apache to host Python web applications such as Django.  mod_wsgi does this by providing Apache an interface to Python as specified by the Web Server Gateway Interface (http://wsgi.readthedocs.org/en/latest/index.html) in PEP 333 document (http://www.python.org/dev/peps/pep-0333/).
 
 Add the following lines to your Apache configuration file httpd.conf.
 

@@ -107,6 +107,6 @@ Run the following:
 
 ----
 
-## RESTful HTTP API
+## 3. RESTful HTTP API
 
 ...
